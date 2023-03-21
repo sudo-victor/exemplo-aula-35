@@ -7,18 +7,34 @@ const url = `https://gateway.marvel.com:443/v1/public/characters?apikey=${public
 
 const listaPersonagens = document.querySelector('#lista-personagens')
 
-buscarPersonagens = async () => {
+let personagens = []
+let pagina = 0
+const frutas = ['maca', 'pera']
+
+function proximaPagina() {
+  pagina += 1
+  const html = `
+    <div>
+      <img class="imagem" src="${personagens[pagina].thumbnail.path}.${personagens[pagina].thumbnail.extension}" />
+      <button onclick="proximaPagina()">proxima pagina</button>
+    </div>
+  `
+  listaPersonagens.innerHTML = html
+}
+
+buscarPersonagens = async (page) => {
   try {
     const resposta = await fetch(url)
-    const personagens = await resposta.json()
-    personagens.data.results.forEach((personagem) => {
-      const html = `
-        <div>
-          <img class="imagem" src="${personagem.thumbnail.path}.${personagem.thumbnail.extension}" />
-        </div>
-      `
-      listaPersonagens.innerHTML += html
-    })
+    const result = await resposta.json()
+
+    const html = `
+      <div>
+        <img class="imagem" src="${result.data.results[pagina].thumbnail.path}.${result.data.results[pagina].thumbnail.extension}" />
+        <button onclick="proximaPagina()">proxima pagina</button>
+      </div>
+    `
+    listaPersonagens.innerHTML = html
+    personagens.push(...result.data.results)
   } catch(error) {
     console.log(error)
   }
